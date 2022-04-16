@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 
 const Todo = ({ message }) => {
-  const [checked, setChecked] = useState(true);
+  const [checked, setChecked] = useState(false);
 
   return (
     <div
-      className={`flex p-4 md:p-6 my-3 w-4/5 items-center rounded-3xl shadow-lg hover:cursor-pointer ${
+      className={`flex p-4 md:p-6 my-3 w-4/5 items-center rounded-3xl shadow-lg hover:cursor-pointer transition-all ${
         checked
           ? "bg-green-600 text-neutral-50"
           : "bg-neutral-100 text-neutral-900"
       }`}
+      onClick={() => setChecked(!checked)}
     >
       <div>
         {checked ? (
@@ -44,10 +45,9 @@ const Todo = ({ message }) => {
           </svg>
         )}
       </div>
-
       <span className=" flex justify-between w-full items-center">
         <div className="ml-6 text-base md:text-xl">{message}</div>
-        <span className="p-2 transition-all hover:text-neutral-50 hover:bg-red-600 rounded-full">
+        <span className="p-2 hover:text-neutral-50 hover:bg-red-600 rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-7 w-7  "

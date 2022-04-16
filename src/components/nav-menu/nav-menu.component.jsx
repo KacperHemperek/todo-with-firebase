@@ -4,7 +4,7 @@ import NavLink from "../nav-link/nav-link/nav-link.component";
 const NavMenu = ({ openedNav }) => {
   return (
     <nav
-      className={`absolute shadow-xl transition-all bg-neutral-100 w-1/2  md:w-1/5 border-t-2 ${
+      className={`absolute shadow-xl transition-all bg-neutral-100 w-1/2  md:w-1/5 border-t-2 z-10 ${
         !openedNav && "-translate-x-full"
       }`}
     >
