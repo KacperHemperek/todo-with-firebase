@@ -23,7 +23,7 @@ const Header = () => {
 
   return (
     <div className="bg-neutral-100 shadow-lg" ref={navbarRef}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center ">
         <button
           className="p-4"
           onClick={() => setOpenedNav(openedNav ? false : true)}
@@ -45,7 +45,7 @@ const Header = () => {
             />
           </svg>
         </button>
-        <div className="flex justify-end items-center w-full">
+        <div className="flex justify-evenly md:justify-end items-center w-full">
           <div>
             <h1 className="text-3xl font-semibold">Todos</h1>
           </div>
@@ -60,11 +60,14 @@ const Header = () => {
               Sign Out
             </Button>
           ) : (
-            <Link to="/signin">
-              <div className="flex justify-center items-center p-4 max-w-full rounded-3xl text-lg font-semibold bg-blue-500 text-neutral-100 my-3 mx-3 md:mx-16 hover:bg-blue-600">
-                Log In
-              </div>
-            </Link>
+            <Button
+              handleClick={() => {
+                navigate("/signin");
+              }}
+              className="bg-blue-500 text-neutral-100 my-3 mx-3 md:mx-16 hover:bg-blue-600"
+            >
+              Sign In
+            </Button>
           )}
         </div>
       </div>

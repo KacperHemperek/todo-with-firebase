@@ -13,6 +13,7 @@ function App() {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      console.log(auth.currentUser);
       if (user) {
         dispatch(
           setUser({ uid: auth.currentUser.uid, email: auth.currentUser.email })
@@ -22,8 +23,6 @@ function App() {
       }
     });
   }, []);
-
-  console.log(auth.currentUser);
 
   return (
     <>

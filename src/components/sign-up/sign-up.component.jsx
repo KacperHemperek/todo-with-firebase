@@ -78,11 +78,7 @@ const SignUp = () => {
           Sing up
         </Button>
       </div>
-      <div>
-        <Button className="bg-sky-600 text-neutral-50 text-base w-full mb-6">
-          Sing up with google
-        </Button>
-      </div>
+
       <div>
         {signUpError ? <ErrorDisplay>{signUpError}</ErrorDisplay> : null}
       </div>
