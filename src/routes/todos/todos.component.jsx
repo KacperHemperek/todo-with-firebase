@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Todo from "../../components/todo/todo.component";
 import Input from "../../components/input/input.component";
 import Button from "../../components/button/button.component";
@@ -15,7 +15,6 @@ const Todos = () => {
     console.log("clicked add");
     console.log(todos);
     setTodos((todos) => [...todos, { id: todos.length + 1, message: newTodo }]);
-    setNewTodo("");
   };
   return (
     <div className="flex flex-col items-center min-h-screen relative">
@@ -35,7 +34,7 @@ const Todos = () => {
         </div>
         <div className="flex items-center justify-center ">
           <Button
-            styles="bg-green-600 text-neutral-50"
+            className="bg-green-600 w-full text-neutral-50"
             handleClick={handleAddTodo}
           >
             <svg
@@ -55,7 +54,7 @@ const Todos = () => {
           </Button>
         </div>
         <div className="flex items-center justify-center">
-          <Button styles="bg-red-600 text-neutral-50">
+          <Button className="bg-red-600 text-neutral-50 w-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
