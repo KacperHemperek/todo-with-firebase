@@ -5,6 +5,8 @@ import Button from "../button/button.component";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import ErrorDisplay from "../errordisplay/error-display.component";
 import { useNavigate } from "react-router-dom";
+import { setDoc, doc, getDoc } from "firebase/firestore";
+import { db } from "../../utils/firebase.utils";
 
 const SignIn = () => {
   const [logInError, setLoginError] = useState("");
@@ -16,16 +18,22 @@ const SignIn = () => {
     e.preventDefault();
 
     try {
-      await signInWithPopup(auth, provider);
+      const credentials = await signInWithPopup(auth, provider);
 
-      try {
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          email: user.email,
-          todos: [],
-        });
-      } catch (error) {
-        console.error(error);
+      const { user } = credentials;
+      if (getDoc(doc(db, "users", user.uid), "users", user.uid).exists) {
+        navigate("/");
+        return;
+      } else {
+        try {
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            todos: [],
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
 
       navigate("/");
