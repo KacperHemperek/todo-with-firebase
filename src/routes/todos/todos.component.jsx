@@ -48,7 +48,8 @@ const Todos = () => {
     setNewTodo(e.target.value);
   };
 
-  const handleAddTodo = async () => {
+  const handleAddTodo = async (e) => {
+    e.preventDefault();
     if (!user) {
       alert("login first to add todo!");
       setNewTodo("");
