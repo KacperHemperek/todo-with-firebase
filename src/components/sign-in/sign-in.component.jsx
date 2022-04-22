@@ -126,7 +126,7 @@ const SignIn = () => {
             className="bg-green-600 text-neutral-50 text-base w-full mb-6"
             type="submit"
           >
-            Sing in
+            Sign in
           </Button>
         </div>
       </form>
@@ -135,7 +135,7 @@ const SignIn = () => {
           className="bg-sky-600 text-neutral-50 text-base w-full mb-6"
           handleClick={handleLogInWithGoogle}
         >
-          Sing in with google
+          Sign in with google
         </Button>
       </div>
       <div>{logInError ? <ErrorDisplay>{logInError}</ErrorDisplay> : null}</div>
