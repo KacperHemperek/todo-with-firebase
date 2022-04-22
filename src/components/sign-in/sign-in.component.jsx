@@ -21,7 +21,9 @@ const SignIn = () => {
       const credentials = await signInWithPopup(auth, provider);
 
       const { user } = credentials;
-      if (getDoc(doc(db, "users", user.uid), "users", user.uid).exists) {
+      const docSnap = await getDoc(doc(db, "users", user.uid));
+      console.log(docSnap.exists());
+      if (docSnap.exists()) {
         navigate("/");
         return;
       } else {
@@ -38,7 +40,6 @@ const SignIn = () => {
 
       navigate("/");
     } catch (error) {
-      console.log(error);
       switch (error.code) {
         case "auth/popup-closed-by-user":
           {
