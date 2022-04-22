@@ -17,6 +17,17 @@ const SignIn = () => {
 
     try {
       await signInWithPopup(auth, provider);
+
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          todos: [],
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
       navigate("/");
     } catch (error) {
       console.log(error);
