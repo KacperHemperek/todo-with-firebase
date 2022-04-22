@@ -1,29 +1,88 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Todo from "../../components/todo/todo.component";
 import Input from "../../components/input/input.component";
 import Button from "../../components/button/button.component";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  arrayUnion,
+  doc,
+  onSnapshot,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../../utils/firebase.utils";
 
 const Todos = () => {
   const [newTodo, setNewTodo] = useState("");
   const [todos, setTodos] = useState([]);
 
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.currentUser);
+
+  useEffect(() => {
+    let unsubscribeFromSnapshot;
+    if (user) {
+      console.log("fetching todos");
+      unsubscribeFromSnapshot = onSnapshot(
+        doc(db, "users", user.uid),
+        (snapshot) => {
+          const todos = snapshot
+            .data()
+            .todos.sort((a, b) => {
+              return a.createdAt.seconds - b.createdAt.seconds;
+            })
+            .map((todo, idx) => ({
+              id: idx,
+              message: todo.message,
+              done: todo.done,
+            }));
+          console.log(todos);
+          setTodos(todos);
+        }
+      );
+    }
+    return unsubscribeFromSnapshot;
+  }, [setTodos, user]);
+
   const handleChange = (e) => {
     setNewTodo(e.target.value);
   };
 
-  const handleAddTodo = () => {
-    console.log("clicked add");
-    console.log(todos);
-    setTodos((todos) => [...todos, { id: todos.length + 1, message: newTodo }]);
+  const handleAddTodo = async () => {
+    if (!user) {
+      alert("login first to add todo!");
+      setNewTodo("");
+      return;
+    }
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+
+      await updateDoc(userDocRef, {
+        todos: arrayUnion({
+          message: newTodo,
+          done: false,
+          createdAt: Timestamp.now(),
+        }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    setNewTodo("");
   };
+
+  const handleRemoveTodo = () => {};
   return (
-    <div className="flex flex-col items-center min-h-screen relative">
-      <div className="flex flex-col items-center w-full pb-56 first:mt-4">
-        {todos.map(({ id, message }) => {
-          return <Todo key={id} message={message} />;
+    <div className="flex flex-col items-center relative">
+      <div className="flex flex-col items-center w-full pb-52 md:pb-28 first:mt-4">
+        {todos.map((todo, index) => {
+          return <Todo key={index} message={todo.message} />;
         })}
       </div>
-      <div className="fixed grid grid-cols-2 gap-6 p-6 bg-neutral-100 md:grid-cols-4 bottom-0 w-full">
+      <form
+        className="fixed grid grid-cols-2 gap-6 p-6 bg-neutral-100 md:grid-cols-4 bottom-0 w-full"
+        onSubmit={handleAddTodo}
+      >
         <div className="flex items-center justify-center col-span-2">
           <Input
             placeholder="Add todo..."
@@ -33,10 +92,7 @@ const Todos = () => {
           />
         </div>
         <div className="flex items-center justify-center ">
-          <Button
-            className="bg-green-600 w-full text-neutral-50"
-            handleClick={handleAddTodo}
-          >
+          <Button className="bg-green-600 w-full text-neutral-50" type="submit">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -71,7 +127,7 @@ const Todos = () => {
             </svg>
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

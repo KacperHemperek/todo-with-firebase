@@ -5,6 +5,8 @@ import Button from "../button/button.component";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import ErrorDisplay from "../errordisplay/error-display.component";
 import { useNavigate } from "react-router-dom";
+import { db } from "../../utils/firebase.utils";
+import { doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
   const emailRefSignUp = useRef("");
@@ -22,7 +24,22 @@ const SignUp = () => {
 
     if (password === confirmPassword) {
       try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const credentials = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        const { user } = credentials;
+        try {
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            todos: [],
+          });
+        } catch (error) {
+          console.error(error);
+        }
         navigate("/");
       } catch (error) {
         switch (error.code) {

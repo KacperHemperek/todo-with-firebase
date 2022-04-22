@@ -1,7 +1,7 @@
 import React from "react";
 
 const Input = React.forwardRef(
-  ({ type, placeholder, onChange, required }, ref) => {
+  ({ type, placeholder, onChange, required, value }, ref) => {
     return (
       <div className="flex justify-center items-center bg-white p-3 w-full h-full rounded-3xl border-2 border-neutral-300 md:text-xl">
         <input
@@ -11,6 +11,7 @@ const Input = React.forwardRef(
           onChange={onChange}
           ref={ref}
           required={required}
+          value={value}
         />
       </div>
     );

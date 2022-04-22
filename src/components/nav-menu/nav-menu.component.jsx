@@ -1,7 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import CustomNavLink from "../nav-link/nav-link.component";
 
 const NavMenu = React.forwardRef(({ openedNav }, ref) => {
+  const currentUser = useSelector((state) => state.user.currentUser);
+
   return (
     <nav
       ref={ref}
@@ -12,7 +15,7 @@ const NavMenu = React.forwardRef(({ openedNav }, ref) => {
       <CustomNavLink link="/">Todos</CustomNavLink>
       <CustomNavLink link="/notes">Notes</CustomNavLink>
       <CustomNavLink link="/about">About</CustomNavLink>
-      <CustomNavLink link="/signin">Sign In</CustomNavLink>
+      {!currentUser && <CustomNavLink link="/signin">Sign In</CustomNavLink>}
     </nav>
   );
 });

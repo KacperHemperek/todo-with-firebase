@@ -1,6 +1,6 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/header/header.component";
 import SignInSignUp from "./routes/sign-in-sign-up/sign-in-sign-up.component";
 import Todos from "./routes/todos/todos.component";
@@ -13,7 +13,6 @@ function App() {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      console.log(auth.currentUser);
       if (user) {
         dispatch(
           setUser({ uid: auth.currentUser.uid, email: auth.currentUser.email })

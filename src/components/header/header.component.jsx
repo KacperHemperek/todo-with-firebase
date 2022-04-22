@@ -6,7 +6,6 @@ import { auth } from "../../utils/firebase.utils";
 import useCloseOnOutsideClick from "../../hooks/useCloseOnOutsideClick";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 
 const Header = () => {
   const [openedNav, setOpenedNav] = useState(false);
@@ -23,7 +22,7 @@ const Header = () => {
 
   return (
     <div className="bg-neutral-100 shadow-lg" ref={navbarRef}>
-      <div className="flex items-center ">
+      <div className="flex">
         <button
           className="p-4"
           onClick={() => setOpenedNav(openedNav ? false : true)}
