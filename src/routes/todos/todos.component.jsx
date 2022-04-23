@@ -10,6 +10,9 @@ import {
   Timestamp,
   query,
   setDoc,
+  where,
+  getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase.utils";
 import { v4 as uuidv4 } from "uuid";
@@ -23,8 +26,8 @@ const Todos = () => {
   useEffect(() => {
     let unsubscribeFromSnapshot;
     if (user) {
-      //getting query for all todos in users collection
       const colectionRef = collection(doc(db, "users", user.uid), "todos");
+      //getting query for all todos in users collection
       const q = query(colectionRef);
 
       //pushing all todos data to array and updating state
@@ -48,9 +51,15 @@ const Todos = () => {
 
   const handleAddTodo = async (e) => {
     e.preventDefault();
+
     if (!user) {
       alert("login first to add todo!");
       setNewTodo("");
+      return;
+    }
+
+    if (!newTodo) {
+      alert("can't add empty todo");
       return;
     }
     try {
@@ -70,7 +79,22 @@ const Todos = () => {
     setNewTodo("");
   };
 
-  const handleRemoveTodos = () => {};
+  const handleRemoveTodos = async (e) => {
+    e.preventDefault();
+    const colectionRef = collection(doc(db, "users", user.uid), "todos");
+    const q = query(colectionRef, where("done", "==", true));
+    try {
+      const doneTodosSnapshot = await getDocs(q);
+
+      console.log(doneTodosSnapshot);
+      doneTodosSnapshot.forEach((doc) => {
+        console.log(doc);
+        deleteDoc(doc.ref);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="flex flex-col items-center relative">
       <div className="flex flex-col items-center w-full pb-52 md:pb-28 first:mt-4">
@@ -88,7 +112,6 @@ const Todos = () => {
             type="text"
             onChange={handleChange}
             value={newTodo}
-            required={true}
           />
         </div>
         <div className="flex items-center justify-center ">
