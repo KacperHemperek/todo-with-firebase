@@ -14,7 +14,7 @@ const Header = () => {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
 
-  useCloseOnOutsideClick(navbarRef, setOpenedNav);
+  useCloseOnOutsideClick(navbarRef, setOpenedNav, false);
 
   useEffect(() => {
     setOpenedNav(false);

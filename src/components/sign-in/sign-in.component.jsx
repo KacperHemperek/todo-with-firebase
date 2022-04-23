@@ -22,7 +22,6 @@ const SignIn = () => {
 
       const { user } = credentials;
       const docSnap = await getDoc(doc(db, "users", user.uid));
-      console.log(docSnap.exists());
       if (docSnap.exists()) {
         navigate("/");
         return;
@@ -31,7 +30,6 @@ const SignIn = () => {
           await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             email: user.email,
-            todos: [],
           });
         } catch (error) {
           console.error(error);

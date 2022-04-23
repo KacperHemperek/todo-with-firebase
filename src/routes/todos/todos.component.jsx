@@ -1,45 +1,43 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Todo from "../../components/todo/todo.component";
 import Input from "../../components/input/input.component";
 import Button from "../../components/button/button.component";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
-  arrayUnion,
+  collection,
   doc,
   onSnapshot,
   Timestamp,
-  updateDoc,
+  query,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "../../utils/firebase.utils";
+import { v4 as uuidv4 } from "uuid";
 
 const Todos = () => {
   const [newTodo, setNewTodo] = useState("");
   const [todos, setTodos] = useState([]);
 
-  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.currentUser);
 
   useEffect(() => {
     let unsubscribeFromSnapshot;
     if (user) {
-      console.log("fetching todos");
-      unsubscribeFromSnapshot = onSnapshot(
-        doc(db, "users", user.uid),
-        (snapshot) => {
-          const todos = snapshot
-            .data()
-            .todos.sort((a, b) => {
-              return a.createdAt.seconds - b.createdAt.seconds;
-            })
-            .map((todo, idx) => ({
-              id: idx,
-              message: todo.message,
-              done: todo.done,
-            }));
-          console.log(todos);
-          setTodos(todos);
-        }
-      );
+      //getting query for all todos in users collection
+      const colectionRef = collection(doc(db, "users", user.uid), "todos");
+      const q = query(colectionRef);
+
+      //pushing all todos data to array and updating state
+      unsubscribeFromSnapshot = onSnapshot(q, (snapshot) => {
+        const todos = [];
+        snapshot.forEach((doc) => {
+          todos.push(doc.data());
+        });
+
+        setTodos(
+          todos.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+        );
+      });
     }
     return unsubscribeFromSnapshot;
   }, [setTodos, user]);
@@ -56,14 +54,14 @@ const Todos = () => {
       return;
     }
     try {
-      const userDocRef = doc(db, "users", user.uid);
+      const todoId = uuidv4();
+      const docRef = doc(db, "users", user.uid, "todos", todoId);
 
-      await updateDoc(userDocRef, {
-        todos: arrayUnion({
-          message: newTodo,
-          done: false,
-          createdAt: Timestamp.now(),
-        }),
+      await setDoc(docRef, {
+        id: todoId,
+        message: newTodo,
+        done: false,
+        createdAt: Timestamp.now(),
       });
     } catch (error) {
       console.error(error);
@@ -72,12 +70,12 @@ const Todos = () => {
     setNewTodo("");
   };
 
-  const handleRemoveTodo = () => {};
+  const handleRemoveTodos = () => {};
   return (
     <div className="flex flex-col items-center relative">
       <div className="flex flex-col items-center w-full pb-52 md:pb-28 first:mt-4">
-        {todos.map((todo, index) => {
-          return <Todo key={index} message={todo.message} />;
+        {todos.map(({ message, done, id }, index) => {
+          return <Todo key={index} id={id} done={done} message={message} />;
         })}
       </div>
       <form
@@ -90,6 +88,7 @@ const Todos = () => {
             type="text"
             onChange={handleChange}
             value={newTodo}
+            required={true}
           />
         </div>
         <div className="flex items-center justify-center ">
@@ -111,7 +110,10 @@ const Todos = () => {
           </Button>
         </div>
         <div className="flex items-center justify-center">
-          <Button className="bg-red-600 text-neutral-50 w-full">
+          <Button
+            className="bg-red-600 text-neutral-50 w-full"
+            handleClick={handleRemoveTodos}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"

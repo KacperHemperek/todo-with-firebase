@@ -1,19 +1,46 @@
-import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
+import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../utils/firebase.utils";
 
-const Todo = ({ message }) => {
-  const [checked, setChecked] = useState(false);
+const Todo = ({ id, message, done }) => {
+  const user = useSelector((state) => state.user.currentUser);
+  const docRef = doc(db, "users", user.uid, "todos", id);
+
+  const toggleDone = async () => {
+    //checks if document still exists
+    if (!(await getDoc(docRef)).exists()) return;
+    //updates database changing value
+    try {
+      await setDoc(
+        docRef,
+        {
+          done: !done,
+        },
+        { merge: true }
+      );
+    } catch (error) {}
+  };
+
+  const deleteTodo = async () => {
+    try {
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error(error.code);
+    }
+  };
 
   return (
     <div
       className={`flex p-4 md:p-6 my-3 w-4/5 items-center rounded-3xl shadow-lg hover:cursor-pointer transition-all ${
-        checked
+        done
           ? "bg-green-600 text-neutral-50"
           : "bg-neutral-100 text-neutral-900"
       }`}
-      onClick={() => setChecked(!checked)}
+      onClick={toggleDone}
     >
       <div>
-        {checked ? (
+        {done ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8"
@@ -47,7 +74,10 @@ const Todo = ({ message }) => {
       </div>
       <span className=" flex justify-between w-full items-center">
         <div className="ml-6 text-base md:text-xl">{message}</div>
-        <span className="p-2 hover:text-neutral-50 hover:bg-red-600 rounded-full">
+        <span
+          className="p-2 hover:text-neutral-50 hover:bg-red-600 rounded-full"
+          onClick={deleteTodo}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-7 w-7  "
