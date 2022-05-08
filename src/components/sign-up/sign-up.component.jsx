@@ -5,63 +5,18 @@ import Button from "../button/button.component";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import ErrorDisplay from "../errordisplay/error-display.component";
 import { useNavigate } from "react-router-dom";
-import { db, provider } from "../../utils/firebase.utils";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { signInWithPopup } from "firebase/auth";
+import { db } from "../../utils/firebase.utils";
+import { doc, setDoc } from "firebase/firestore";
+import useLogInWithGoogle from "../../hooks/useLogInWithGoogle";
 
 const SignUp = () => {
   const emailRefSignUp = useRef("");
   const passwordRefSignUp = useRef("");
   const confirmPassrowdRefSignUp = useRef("");
   const navigate = useNavigate();
+  const [logInWithGoogle, error] = useLogInWithGoogle();
 
   const [signUpError, setSignUpError] = useState("");
-
-  const handleLogInWithGoogle = async (e) => {
-    e.preventDefault();
-
-    try {
-      const credentials = await signInWithPopup(auth, provider);
-
-      const { user } = credentials;
-      const docSnap = await getDoc(doc(db, "users", user.uid));
-      console.log(docSnap.exists());
-      if (docSnap.exists()) {
-        navigate("/");
-        return;
-      } else {
-        try {
-          await setDoc(doc(db, "users", user.uid), {
-            uid: user.uid,
-            email: user.email,
-            todos: [],
-          });
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      navigate("/");
-    } catch (error) {
-      switch (error.code) {
-        case "auth/popup-closed-by-user":
-          {
-            setSignUpError("");
-          }
-          break;
-        case "auth/cancelled-popup-request":
-          {
-            setSignUpError("");
-          }
-          break;
-        default:
-          {
-            console.error(error);
-          }
-          break;
-      }
-    }
-  };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -106,7 +61,7 @@ const SignUp = () => {
 
   return (
     <form
-      className="w-5/6 lg:w-1/3 p-8 bg-neutral-100 shadow-xl m-8 rounded-3xl"
+      className="w-11/12 lg:w-1/3 p-8 bg-neutral-100 shadow-xl my-6 md:mx-8 rounded-3xl"
       onSubmit={handleCreateUser}
     >
       <h1 className="text-xl font-semibold">Sign Up</h1>
@@ -143,15 +98,13 @@ const SignUp = () => {
         </Button>
         <Button
           className="bg-sky-600 text-neutral-50 text-base w-full mb-6"
-          handleClick={handleLogInWithGoogle}
+          handleClick={logInWithGoogle}
         >
           Sign up with google
         </Button>
       </div>
 
-      <div>
-        {signUpError ? <ErrorDisplay>{signUpError}</ErrorDisplay> : null}
-      </div>
+      <div>{signUpError ? <ErrorDisplay>{error}</ErrorDisplay> : null}</div>
     </form>
   );
 };

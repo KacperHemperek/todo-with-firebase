@@ -34,6 +34,7 @@ const Todos = () => {
       unsubscribeFromSnapshot = onSnapshot(q, (snapshot) => {
         const todos = [];
         snapshot.forEach((doc) => {
+          console.log(doc.data());
           todos.push(doc.data());
         });
 
@@ -51,17 +52,19 @@ const Todos = () => {
 
   const handleAddTodo = async (e) => {
     e.preventDefault();
-
+    //checking if user is logged in
     if (!user) {
       alert("login first to add todo!");
       setNewTodo("");
       return;
     }
-
+    //checking if input field is not empty
     if (!newTodo) {
       alert("can't add empty todo");
       return;
     }
+
+    //creating todo in firebase as a document in todos collection
     try {
       const todoId = uuidv4();
       const docRef = doc(db, "users", user.uid, "todos", todoId);
